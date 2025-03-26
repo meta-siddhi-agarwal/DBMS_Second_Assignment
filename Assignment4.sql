@@ -1,0 +1,19 @@
+SHOW DATABASES;
+
+USE StoreFont;
+
+CREATE TABLE ZipCode(CityId INT, Code VARCHAR(10));
+
+DROP TABLE ZipCode;
+
+CREATE TABLE State(Id INT PRIMARY KEY, StateName VARCHAR(20) UNIQUE KEY NOT NULL);
+
+CREATE TABLE City(StateId INT, CityId INT PRIMARY KEY, Name VARCHAR(20) NOT NULL, FOREIGN KEY(StateId) 
+REFERENCES State(Id));
+
+CREATE TABLE ZipCode(CityId INT, Code VARCHAR(10), FOREIGN KEY(CityId) REFERENCES City(CityId));
+
+SHOW TABLES;
+
+SELECT Code, Name, StateName FROM ZipCode,City,State WHERE ZipCode.CityId=City.CityId
+AND City.StateId=State.Id;
