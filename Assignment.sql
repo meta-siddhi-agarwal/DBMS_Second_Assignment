@@ -2,38 +2,123 @@ CREATE DATABASE StoreFont;
 
 USE StoreFont;
 
-CREATE TABLE User(UserId INT PRIMARY KEY, Name VARCHAR(30) NOT NULL,
-Email VARCHAR(40) UNIQUE KEY, Phone VARCHAR(50), Password VARCHAR(20) 
-UNIQUE KEY NOT NULL, Address VARCHAR(50));
+-- User Table
+CREATE TABLE User(
+Email VARCHAR(20) UNIQUE KEY NOT NULL, 
+Password VARCHAR(20) UNIQUE KEY NOT NULL, 
+UserType VARCHAR(10) CHECK (UserType IN("Shopper","Administrator") )
+);
 
 DESC User;
 
-DROP TABLE USER;
+-- Shopper Table
+CREATE TABLE Shopper(
+ShopperId INT PRIMARY KEY, 
+Name VARCHAR(20), 
+MobileNumber VARCHAR(20) UNIQUE KEY, 
+Dob Date, 
+GENDER VARCHAR(10));
 
-CREATE TABLE User(UserId INT PRIMARY KEY, Name VARCHAR(30) NOT NULL,
-Email VARCHAR(40) UNIQUE KEY, Phone VARCHAR(50), Password VARCHAR(20) 
-UNIQUE KEY NOT NULL);
+DESC Shopper;
 
-DROP TABLE User;
+-- Admin Table
+CREATE TABLE Admin(AdminId INT PRIMARY KEY, Name VARCHAR(20) NOT NULL);
 
-CREATE TABLE User(UserId INT PRIMARY KEY, Name VARCHAR(30) NOT NULL,
-Email VARCHAR(40) UNIQUE KEY NOT NULL, Password VARCHAR(20) UNIQUE KEY NOT NULL);
+DESC Admin;
 
-CREATE TABLE Phone(PhoneId INT PRIMARY KEY, UserId INT ,PhoneNumber VARCHAR(20));
+-- Address Table
+CREATE TABLE Address(
+ShopperId INT ,
+AddressLine VARCHAR(20) UNIQUE KEY, 
+City VARCHAR(10) NOT NULL,
+State VARCHAR(20) NOT NULL,
+Country VARCHAR(20) NOT NULL,
+PinCode VARCHAR(10) NOT NULL,
+FOREIGN KEY (ShopperId) REFERENCES Shopper(ShopperId)
+);
 
-CREATE TABLE Address(AddressId INT PRIMARY KEY, UserId INT ,Address VARCHAR(20));
+DESC Address;
 
-DROP TABLE Address;
+-- Products Table
+CREATE TABLE Products(
+ProductId INT PRIMARY KEY, 
+Title VARCHAR(20) NOT NULL, 
+Quantity INT NOT NULL, 
+PRICE DECIMAL NOT NULL, 
+Description VARCHAR(50), 
+Product_Status VARCHAR(20)
+CHECK(Product_Status IN("Active","Inactive")) DEFAULT "Active",
+AddedAt DATE
+);
 
-CREATE TABLE Address(AddressId INT  ,Address VARCHAR(20), FOREIGN KEY (AddressId) REFERENCES User (UserId));
+DESC Products;
 
-DROP TABLE Phone;
+-- drop table products
+DROP TABLE Products;
 
-CREATE TABLE Phone(PhoneId INT PRIMARY KEY ,PhoneNumber VARCHAR(20), FOREIGN KEY(PhoneId) REFERENCES User(UserId));
+-- Products Table
+CREATE TABLE Products(
+ProductId INT PRIMARY KEY, 
+Title VARCHAR(20) NOT NULL, 
+Quantity INT NOT NULL, 
+PRICE DECIMAL NOT NULL, 
+Description VARCHAR(50), 
+Product_Status VARCHAR(20)
+CHECK(Product_Status IN("Active","Inactive")) DEFAULT "Active",
+AddedAt DATE
+);
 
-CREATE TABLE Orders (OrderId INT PRIMARY KEY,OrderStatus VARCHAR(10) CHECK ( OrderStatus IN("Shipped","Cancelled","Returned")),
-OrderDate DATE, OrderPrice DECIMAL);
+DESC Products;
 
-SHOW TABLES;
+-- Image table
+CREATE TABLE Image(
+ProductId INT, 
+ImageUrl VARCHAR(20), 
+FOREIGN KEY(ProductId) REFERENCES Products(ProductId)
+);
+
+DESC Image;
+
+-- Category Table
+CREATE TABLE Category(
+Cat_Id INT PRIMARY KEY, 
+Cat_Title VARCHAR(20) UNIQUE KEY NOT NULL, 
+Parent_Cat_Id INT,
+FOREIGN KEY(Parent_Cat_Id) REFERENCES Category(Cat_Id));
 
 
+DESC Category;
+
+-- Product Category Junction Table
+CREATE TABLE Product_Category(
+ProductId INT, Cat_Id INT, 
+FOREIGN KEY(ProductId) REFERENCES Products(ProductId),
+FOREIGN KEY(Cat_Id) REFERENCES Category(Cat_Id));
+
+DESC Product_Category;
+
+-- Orders Table
+CREATE TABLE Orders(
+ShopperId INT ,
+OrderDate DATE NOT NULL,
+OrderTotal DECIMAL NOT NULL,
+OrderId INT PRIMARY KEY,
+FOREIGN KEY(ShopperId) REFERENCES Shopper(ShopperId));
+
+DESC Orders;
+
+-- OrderItem Table
+CREATE TABLE OrderItem(
+OrderId INT, 
+OrderStatus VARCHAR(20) CHECK(OrderStatus IN("Shipped","Cancelled","Returned")), 
+OrderItemId INT PRIMARY KEY,
+Quantity INT NOT NULL, 
+ProductId INT,
+FOREIGN KEY(OrderId) REFERENCES Orders(OrderId), 
+FOREIGN KEY(ProductId) REFERENCES Products(ProductId));
+
+DESC OrderItem;
+
+SHOW Tables;
+
+ALTER TABLE User MODIFY Email VARCHAR(100);
